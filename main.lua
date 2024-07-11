@@ -9,7 +9,7 @@ local function draw(wall)
     cr:set_source_rgb(1, 1, 1)
     cr:paint()
 
-    wall:Draw(cr)
+    --wall:Draw(cr)
     wall:TileSquares(cr, 10, 10, 5)
 
     local err = img:write_to_png("wall.png")

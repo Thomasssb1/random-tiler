@@ -7,23 +7,31 @@ function quad.new(point1, point2, point3, point4)
     self.point2 = node.new(point2.x, point2.y)
     self.point3 = node.new(point3.x, point3.y)
     self.point4 = node.new(point4.x, point4.y)
-    local polygons = {}
     return self
 end
 
 function quad:TileSquares(cr, height, width, tileSize)
     local max, min = self:GetMinMax()
     local total = {}
+    local currentTile = {}
     for y = min.y, max.y - height, height do
-        for x = min.x, max.x - width, width do
+        for x = min.x, max.x - width, width do 
             local newQuad = quad.new(
                 {x = x, y = y},
                 {x = x + width, y = y},
                 {x = x, y = y + height},
                 {x = x + width, y = y + height}
             )
-            newQuad:Draw(cr)
-            table.insert(total, newQuad)
+            table.insert(currentTile, newQuad)
+            if (#currentTile == tileSize) then
+                table.insert(total, currentTile)
+                cr:set_source_rgb(math.random(), math.random(), math.random())
+                for _, v in ipairs(currentTile) do
+                    cr:rectangle(v.point1.x, v.point1.y, width, height)
+                    cr:fill()
+                end
+                currentTile = {}
+            end
         end
     end
 end
