@@ -1,4 +1,5 @@
 local node = require "node"
+local tile = require "tile"
 local quad = {}
 
 function quad.new(point1, point2, point3, point4)
@@ -21,11 +22,7 @@ function quad:TileSquares(height, width, tileSize)
         local start = reverse and (xInterval * width) + min.x - xInterval or min.x
         local finish = reverse and min.x or (xInterval * width) - xInterval + min.x
 
-        for x = start, finish, reverse and -xInterval or xInterval do           
-
-            if reverse then
-                --x = (xInterval * width) - x
-            end
+        for x = start, finish, reverse and -xInterval or xInterval do
 
             local newQuad = quad.new(
                     {x = x, y = y},
@@ -36,13 +33,13 @@ function quad:TileSquares(height, width, tileSize)
             
             table.insert(currentTile, newQuad)
             if (#currentTile == tileSize) then
-                table.insert(total, currentTile)
+                table.insert(total, tile.new(currentTile))
                 currentTile = {}
             end
         end
         reverse = not reverse
     end
-    table.insert(total, currentTile)
+    table.insert(total, tile.new(currentTile))
     return total
 end
 
@@ -74,7 +71,6 @@ function quad:Draw(cr)
     local width = max.x - min.x
     local height = max.y - min.y
     cr:rectangle(min.x, min.y, width, height)
-    cr:fill()
 end
 
 return quad

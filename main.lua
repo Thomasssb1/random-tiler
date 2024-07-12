@@ -9,15 +9,10 @@ local function draw(wall)
     cr:set_source_rgb(1, 1, 1)
     cr:paint()
 
-    --wall:Draw(cr)
-    local parts = wall:TileSquares(12, 12, 5)
-    for _, part in ipairs(parts) do
-        cr:set_source_rgb(math.random(), math.random(), math.random())
-        for _, polyquad in ipairs(part) do
-            polyquad:Draw(cr)
-        end
+    local tiles = wall:TileSquares(12, 12, 7)
+    for _, v in ipairs(tiles) do
+        v:Draw(cr)
     end
-
 
     local err = img:write_to_png("wall.png")
 end
