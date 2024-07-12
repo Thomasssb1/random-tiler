@@ -10,30 +10,40 @@ function quad.new(point1, point2, point3, point4)
     return self
 end
 
-function quad:TileSquares(cr, height, width, tileSize)
+function quad:TileSquares(height, width, tileSize)
     local max, min = self:GetMinMax()
     local total = {}
     local currentTile = {}
-    for y = min.y, max.y - height, height do
-        for x = min.x, max.x - width, width do 
+    local xInterval, yInterval = math.floor((max.x - min.x) / width), math.floor((max.y - min.y)/ height)
+    local reverse = false
+    for y = min.y, (yInterval * height) - yInterval + min.y, yInterval do
+
+        local start = reverse and (xInterval * width) + min.x - xInterval or min.x
+        local finish = reverse and min.x or (xInterval * width) - xInterval + min.x
+
+        for x = start, finish, reverse and -xInterval or xInterval do           
+
+            if reverse then
+                --x = (xInterval * width) - x
+            end
+
             local newQuad = quad.new(
-                {x = x, y = y},
-                {x = x + width, y = y},
-                {x = x, y = y + height},
-                {x = x + width, y = y + height}
-            )
+                    {x = x, y = y},
+                    {x = x + xInterval, y = y},
+                    {x = x, y = y + yInterval},
+                    {x = x + xInterval, y = y + yInterval}
+                )
+            
             table.insert(currentTile, newQuad)
             if (#currentTile == tileSize) then
                 table.insert(total, currentTile)
-                cr:set_source_rgb(math.random(), math.random(), math.random())
-                for _, v in ipairs(currentTile) do
-                    cr:rectangle(v.point1.x, v.point1.y, width, height)
-                    cr:fill()
-                end
                 currentTile = {}
             end
         end
+        reverse = not reverse
     end
+    table.insert(total, currentTile)
+    return total
 end
 
 function quad:GetMinMax()
@@ -63,9 +73,8 @@ function quad:Draw(cr)
     local min, max = self:GetMinMax()
     local width = max.x - min.x
     local height = max.y - min.y
-    cr:set_source_rgb(1, 0, 0)
     cr:rectangle(min.x, min.y, width, height)
-    cr:stroke()
+    cr:fill()
 end
 
 return quad
