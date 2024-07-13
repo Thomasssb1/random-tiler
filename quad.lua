@@ -8,7 +8,31 @@ function quad.new(point1, point2, point3, point4)
     self.point2 = node.new(point2.x, point2.y)
     self.point3 = node.new(point3.x, point3.y)
     self.point4 = node.new(point4.x, point4.y)
+    self.neighbours = {
+        tl = nil,
+        tm = nil,
+        tr = nil,
+        ml = nil,
+        mr = nil,
+        bl = nil,
+        bm = nil,
+        br = nil
+    }
+    self.movable = false
+    self.tile = nil
     return self
+end
+
+function quad:Clone(otherQuad)
+    self.point1 = otherQuad.point1
+    self.point2 = otherQuad.point2
+    self.point3 = otherQuad.point3
+    self.point4 = otherQuad.point4
+    self.above = otherQuad.above
+    self.below = otherQuad.below
+    self.left = otherQuad.left
+    self.right = otherQuad.right
+    self.tile = otherQuad.tile
 end
 
 function quad:TileSquares(height, width, tileSize)
@@ -18,12 +42,10 @@ function quad:TileSquares(height, width, tileSize)
     local xInterval, yInterval = math.floor((max.x - min.x) / width), math.floor((max.y - min.y)/ height)
     local reverse = false
     for y = min.y, (yInterval * height) - yInterval + min.y, yInterval do
-
         local start = reverse and (xInterval * width) + min.x - xInterval or min.x
         local finish = reverse and min.x or (xInterval * width) - xInterval + min.x
 
         for x = start, finish, reverse and -xInterval or xInterval do
-
             local newQuad = quad.new(
                     {x = x, y = y},
                     {x = x + xInterval, y = y},
@@ -64,6 +86,16 @@ function quad:GetMinMax()
     checkForMinMax(self.point3)
     checkForMinMax(self.point4)
     return {x = maxX, y = maxY}, {x = minX, y = minY}
+end
+
+function quad:SetNeighbour(location, newQuad)
+    print(location, newQuad)
+    self.neighbours[location] = newQuad
+    if newQuad.tile == self.tile then
+        return 1
+    else
+        return 0
+    end
 end
 
 function quad:Draw(cr)
